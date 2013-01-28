@@ -51,7 +51,8 @@ YUIConfigurator.prototype = {
       for (k in groups) {
         groups[k].modules = this.buildModuleDefinition(
           config.groups[k].modules,
-          config.groups[k].excludeFiles || []
+          config.groups[k].excludeFiles || [],
+          config.groups[k].processPath
         );
 
         delete config.groups[k].excludeFiles;
@@ -61,7 +62,8 @@ YUIConfigurator.prototype = {
     if (config.modules) {
       config.modules = this.buildModuleDefinition(
         config.modules,
-        config.excludeFiles || []
+        config.excludeFiles || [],
+        config.processPath
       );
 
       delete config.excludeFiles;
@@ -73,8 +75,10 @@ YUIConfigurator.prototype = {
   /**
   @method buildModuleDefinition
   @param {Array} paths
+  @param {Array} exclusions
+  @param {Function} processPath - optional
   **/
-  buildModuleDefinition: function (paths, exclusions) {
+  buildModuleDefinition: function (paths, exclusions, processPath) {
     var grunt = this.grunt,
         modules = {};
 
@@ -85,10 +89,13 @@ YUIConfigurator.prototype = {
     paths.forEach(function (p) {
       if (exclusions.indexOf(p) !== -1) return;
 
+      // process the path if a processor is provided
+      fullpath = (processPath ? processPath(p) : p);
+
       // overwrite add on the YUI global for each path to record the path
       YUI.add = function (name, module, version, options) {
         modules[name] = {
-          fullpath: p,
+          fullpath: fullpath,
           requires: options.requires || []
         };
       };

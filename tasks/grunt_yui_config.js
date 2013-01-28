@@ -17,8 +17,6 @@ module.exports = function (grunt) {
     config.build();
 
     grunt.file.write(dest, config.output);
-
-    console.log(config.output);
   });
 
 };

@@ -8,6 +8,9 @@ module.exports = function(grunt) {
           myGroup: {
             comboBase: 'super/cool/path',
             modules: ['test/fixtures/**/*.js'],
+            processPath: function (p) {
+              return p.replace('test', 'public');
+            },
             excludeFiles: ['test/fixtures/not_me.js']
           }
         }
