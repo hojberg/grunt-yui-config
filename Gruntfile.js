@@ -3,10 +3,9 @@ module.exports = function(grunt) {
     yuiConfig: {
       options: {
         dest: 'yui_config.js',
-        comboBase: 'my_base_path',
         groups: {
           myGroup: {
-            comboBase: 'super/cool/path',
+            comboBase: 'super/{{hash}}/path',
             modules: ['test/fixtures/**/*.js'],
             processPath: function (p) {
               return p.replace('test', 'public');

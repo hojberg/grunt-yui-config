@@ -47,3 +47,9 @@ itself.
 ## excludeFiles
 use the `excludeFiles` options to exclude any non YUI modules from to build
 the config from.
+
+## `{{hash}}` in `comboBase`
+
+Provide `{{hash}}` in your comboBase string and it will be interpolated with 
+a sha of the contents of the files in the associated `group`. This is useful
+for providing a fully cachable url.

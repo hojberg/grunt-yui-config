@@ -1,4 +1,5 @@
-var path = require('path');
+var path    = require('path'),
+    crypto  = require('crypto');
 
 // overwrite the global YUI object to sniff module meta data
 global.YUI = {
@@ -10,8 +11,8 @@ global.YUI = {
 @constructor
 **/
 var YUIConfigurator = function (options, grunt) {
-  this.options = options;
-  this.grunt = grunt;
+  this.options  = options;
+  this.grunt    = grunt;
 };
 
 YUIConfigurator.prototype = {
@@ -32,7 +33,7 @@ YUIConfigurator.prototype = {
   createConfig: function () {
     var config = this.extractModuleDefinitions(this.options);
 
-    this.output = "YUI.applyConfig(" + JSON.stringify(config) + ");"
+    this.output = "YUI.applyConfig(" + JSON.stringify(config) + ");";
   },
 
   /**
@@ -45,35 +46,51 @@ YUIConfigurator.prototype = {
   **/
   extractModuleDefinitions: function (config) {
     var groups = config.groups,
-        k;
+        k, comboBase, shasum;
 
     if (groups) {
       for (k in groups) {
-        if ('modules' in groups[k]) {
-          groups[k].modules = this.buildModuleDefinition(
-            config.groups[k].modules,
-            config.groups[k].excludeFiles || [],
-            config.groups[k].processPath
-          );
-
-          delete config.groups[k].excludeFiles;
-          delete config.groups[k].processPath;
-        }
+        groups[k] = this._buildGroup(groups[k]);
       }
     }
 
-    if (config.modules) {
-      config.modules = this.buildModuleDefinition(
-        config.modules,
-        config.excludeFiles || [],
-        config.processPath
-      );
-
-      delete config.excludeFiles;
-      delete config.processPath;
-    }
+    config = this._buildGroup(config);
 
     return config;
+  },
+
+  /**
+  @method _buildGroup
+  @param {Object} group
+  @returns {Object} group
+  @protected
+  **/
+  _buildGroup: function (group) {
+    var shasum        = crypto.createHash('sha1'),
+        fileContents  = [],
+        comboBase     = group.comboBase || '',
+        definitions;
+
+    if ('modules' in group) {
+      definitions = this.buildModuleDefinition(
+        group.modules,
+        group.excludeFiles || [],
+        group.processPath
+      );
+
+      group.modules = definitions.modules;
+      fileContents  = definitions.contents;
+
+      delete group.excludeFiles;
+      delete group.processPath;
+
+      if (comboBase.indexOf('{{hash}}')) {
+        shasum.update(fileContents.join(''));
+        group.comboBase = comboBase.replace('{{hash}}', shasum.digest('hex'));
+      }
+    }
+
+    return group;
   },
 
   /**
@@ -83,14 +100,18 @@ YUIConfigurator.prototype = {
   @param {Function} processPath - optional
   **/
   buildModuleDefinition: function (paths, exclusions, processPath) {
-    var grunt = this.grunt,
-        modules = {};
+    var grunt     = this.grunt,
+        contents  = [],
+        modules   = {};
 
     // expand glob
     paths       = grunt.file.expand(paths);
     exclusions  = grunt.file.expand(exclusions);
 
     paths.forEach(function (p) {
+      var resolvedPath = path.resolve(p),
+          fullpath;
+
       if (exclusions.indexOf(p) !== -1) return;
 
       // process the path if a processor is provided
@@ -105,10 +126,15 @@ YUIConfigurator.prototype = {
       };
 
       // load in the YUI module to sniff the meta data
-      require(path.resolve(p));
+      require(resolvedPath);
+
+      contents.push(grunt.file.read(resolvedPath));
     });
 
-    return modules;
+    return {
+      modules:  modules,
+      contents: contents
+    }
   }
 
 };
