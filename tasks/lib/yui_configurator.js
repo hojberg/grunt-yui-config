@@ -1,3 +1,5 @@
+var path = require('path');
+
 // overwrite the global YUI object to sniff module meta data
 global.YUI = {
   add: function () {}
@@ -42,13 +44,14 @@ YUIConfigurator.prototype = {
   @returns {Object}
   **/
   extractModuleDefinitions: function (config) {
-    var groups = config.groups;
+    var groups = config.groups,
+        k;
 
     if (groups) {
-      for (var key in groups) {
-        group.modules = this.buildModuleDefinition(group.modules);
-
-        config.groups[key] = group;
+      for (k in groups) {
+        groups[k].modules = this.buildModuleDefinition(
+          config.groups[k].modules
+        );
       }
     }
 
@@ -64,22 +67,23 @@ YUIConfigurator.prototype = {
   @param {Array} paths
   **/
   buildModuleDefinition: function (paths) {
-    var modules = {};
+    var grunt = this.grunt,
+        modules = {};
 
     // expand glob
-    paths = this.grunt.file.expand(paths);
+    paths = grunt.file.expand(paths);
 
-    paths.forEach(function (path) {
+    paths.forEach(function (p) {
       // overwrite add on the YUI global for each path to record the path
       YUI.add = function (name, module, version, options) {
         modules[name] = {
-          fullpath: path,
+          fullpath: p,
           requires: options.requires || []
         };
       };
 
       // load in the YUI module to sniff the meta data
-      require('../../' + path);
+      require(path.resolve(p));
     });
 
     return modules;

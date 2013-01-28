@@ -7,7 +7,7 @@ module.exports = function(grunt) {
         groups: {
           myGroup: {
             comboBase: 'super/cool/path',
-            modules: ['./test/fixtures/**/*.js']
+            modules: ['test/fixtures/**/*.js']
           }
         }
       }
