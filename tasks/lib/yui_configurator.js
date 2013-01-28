@@ -49,14 +49,16 @@ YUIConfigurator.prototype = {
 
     if (groups) {
       for (k in groups) {
-        groups[k].modules = this.buildModuleDefinition(
-          config.groups[k].modules,
-          config.groups[k].excludeFiles || [],
-          config.groups[k].processPath
-        );
+        if ('modules' in groups[k]) {
+          groups[k].modules = this.buildModuleDefinition(
+            config.groups[k].modules,
+            config.groups[k].excludeFiles || [],
+            config.groups[k].processPath
+          );
 
-        delete config.groups[k].excludeFiles;
-        delete config.groups[k].processPath;
+          delete config.groups[k].excludeFiles;
+          delete config.groups[k].processPath;
+        }
       }
     }
 
