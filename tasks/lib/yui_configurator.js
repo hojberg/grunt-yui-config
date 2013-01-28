@@ -56,6 +56,7 @@ YUIConfigurator.prototype = {
         );
 
         delete config.groups[k].excludeFiles;
+        delete config.groups[k].processPath;
       }
     }
 
@@ -67,6 +68,7 @@ YUIConfigurator.prototype = {
       );
 
       delete config.excludeFiles;
+      delete config.processPath;
     }
 
     return config;
