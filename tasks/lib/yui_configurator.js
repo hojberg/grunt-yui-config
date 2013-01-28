@@ -50,13 +50,21 @@ YUIConfigurator.prototype = {
     if (groups) {
       for (k in groups) {
         groups[k].modules = this.buildModuleDefinition(
-          config.groups[k].modules
+          config.groups[k].modules,
+          config.groups[k].excludeFiles || []
         );
+
+        delete config.groups[k].excludeFiles;
       }
     }
 
     if (config.modules) {
-      config.modules = this.buildModuleDefinition(config.modules);
+      config.modules = this.buildModuleDefinition(
+        config.modules,
+        config.excludeFiles || []
+      );
+
+      delete config.excludeFiles;
     }
 
     return config;
@@ -66,14 +74,17 @@ YUIConfigurator.prototype = {
   @method buildModuleDefinition
   @param {Array} paths
   **/
-  buildModuleDefinition: function (paths) {
+  buildModuleDefinition: function (paths, exclusions) {
     var grunt = this.grunt,
         modules = {};
 
     // expand glob
-    paths = grunt.file.expand(paths);
+    paths       = grunt.file.expand(paths);
+    exclusions  = grunt.file.expand(exclusions);
 
     paths.forEach(function (p) {
+      if (exclusions.indexOf(p) !== -1) return;
+
       // overwrite add on the YUI global for each path to record the path
       YUI.add = function (name, module, version, options) {
         modules[name] = {
