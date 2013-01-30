@@ -2,7 +2,7 @@ module.exports = function (grunt) {
 
   var YUIConfigurator = require('./lib/yui_configurator');
 
-  grunt.registerTask('yuiConfig', 'Configure YUI with automatic module definitions', function() {
+  grunt.registerMultiTask('yuiConfig', 'Configure YUI with automatic module definitions', function() {
     var options = this.options({ dest: 'yui_config.js' }),
         dest    = options.dest,
         config;
