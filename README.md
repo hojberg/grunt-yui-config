@@ -14,17 +14,19 @@ npm install grunt-yui-config --save-dev
 ```javascript
 grunt.initConfig({
   yuiConfig: {
-    options: {
-      dest: 'yui_config.js',
-      comboBase: 'my/base/path',
-      groups: {
-        myGroup: {
-          comboBase: 'my/other/path',
-          modules: ['path/to/my/modules/**/*.js'],
-          processPath: function (p) {
-            return p.replace('path', 'public');
-          },
-          excludeFiles: ['path/to/exclude/**/*.js']
+    hojberg: {
+      options: {
+        dest: 'yui_config.js',
+        comboBase: 'my/base/path',
+        groups: {
+          myGroup: {
+            comboBase: 'my/other/path',
+            modules: ['path/to/my/modules/**/*.js'],
+            processPath: function (p) {
+              return p.replace('path', 'public');
+            },
+            excludeFiles: ['path/to/exclude/**/*.js']
+          }
         }
       }
     }
