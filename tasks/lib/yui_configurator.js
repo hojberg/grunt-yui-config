@@ -111,21 +111,21 @@ YUIConfigurator.prototype = {
     paths.forEach(function (p) {
       var resolvedPath  = path.resolve(p),
           content       = grunt.file.read(resolvedPath),
-          fullpath,
-          parts, 
+          path,
+          parts,
           name;
 
       if (exclusions.indexOf(p) !== -1) return;
 
       // process the path if a processor is provided
-      fullpath = (processPath ? processPath(p) : p);
+      path = (processPath ? processPath(p) : p);
 
       // is it a yui module?
       if (content.indexOf('YUI.add') !== -1) {
         // overwrite add on the YUI global for each path to record the path
         YUI.add = function (name, module, version, options) {
           modules[name] = {
-            fullpath: fullpath,
+            path: path,
             requires: options.requires || []
           };
         };
@@ -134,10 +134,10 @@ YUIConfigurator.prototype = {
         require(resolvedPath);
       }
       else {
-        parts = fullpath.split('/');
+        parts = path.split('/');
         name  = parts[parts.length - 1].replace('.js', '');
         modules[name] = {
-          fullpath: fullpath
+          path: path
         }
       }
 
