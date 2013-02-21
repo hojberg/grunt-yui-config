@@ -15,6 +15,17 @@ module.exports = function(grunt) {
             }
           }
         }
+      },
+      server: {
+        options: {
+          dest: 'yui_config_server.js',
+          applyConfig: false,
+          groups: {
+            myGroup: {
+              modules: ['test/fixtures/**/*.js']
+            }
+          }
+        }
       }
     }
   });

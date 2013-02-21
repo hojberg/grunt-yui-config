@@ -18,7 +18,7 @@ var YUIConfigurator = function (options, grunt) {
 YUIConfigurator.prototype = {
 
   /**
-  add all the modules from paths and create the 
+  add all the modules from paths and create the
   config file from the template
 
   @method build
@@ -31,13 +31,22 @@ YUIConfigurator.prototype = {
   @method createConfig
   **/
   createConfig: function () {
-    var config = this.extractModuleDefinitions(this.options);
+    var opts        = this.options,
+        applyConfig = opts.applyConfig,
+        config      = this.extractModuleDefinitions(opts),
+        output;
 
-    this.output = "YUI.applyConfig(" + JSON.stringify(config) + ");";
+    config = JSON.stringify(config);
+
+    if (applyConfig) {
+      config = "YUI.applyConfig(" + JSON.stringify(config) + ");";
+    }
+
+    this.output = config;
   },
 
   /**
-  replaces `mouldes` keys with the complete 
+  replaces `modules` keys with the complete
   definition of name, path and requirements
 
   @method extractModuleDefinitions
@@ -47,6 +56,8 @@ YUIConfigurator.prototype = {
   extractModuleDefinitions: function (config) {
     var groups = config.groups,
         k, comboBase, shasum;
+
+    delete config.applyConfig;
 
     if (groups) {
       for (k in groups) {
