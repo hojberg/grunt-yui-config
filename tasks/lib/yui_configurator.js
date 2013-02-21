@@ -94,6 +94,7 @@ YUIConfigurator.prototype = {
       fileContents  = definitions.contents;
 
       delete group.excludeFiles;
+      delete group.useFullPath;
       delete group.processPath;
 
       if (comboBase.indexOf('{{hash}}')) {
