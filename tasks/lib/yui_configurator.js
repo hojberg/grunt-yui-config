@@ -85,6 +85,7 @@ YUIConfigurator.prototype = {
     if ('modules' in group) {
       definitions = this.buildModuleDefinition(
         group.modules,
+        group.useFullPath,
         group.excludeFiles || [],
         group.processPath
       );
@@ -107,11 +108,13 @@ YUIConfigurator.prototype = {
   /**
   @method buildModuleDefinition
   @param {Array} paths
+  @param {Boolean} useFullPath
   @param {Array} exclusions
   @param {Function} processPath - optional
   **/
-  buildModuleDefinition: function (paths, exclusions, processPath) {
+  buildModuleDefinition: function (paths, useFullPath, exclusions, processPath) {
     var grunt     = this.grunt,
+        pathKey   = useFullPath ? 'fullpath' : 'path',
         contents  = [],
         modules   = {};
 
@@ -136,9 +139,10 @@ YUIConfigurator.prototype = {
         // overwrite add on the YUI global for each path to record the path
         YUI.add = function (name, module, version, options) {
           modules[name] = {
-            path: modpath,
             requires: options.requires || []
           };
+
+          modules[name][pathKey] = modpath;
         };
 
         // load in the YUI module to sniff the meta data
@@ -147,9 +151,8 @@ YUIConfigurator.prototype = {
       else {
         parts = modpath.split('/');
         name  = parts[parts.length - 1].replace('.js', '');
-        modules[name] = {
-          path: modpath
-        }
+        modules[name] = {};
+        modules[name][pathKey] = modpath;
       }
 
       contents.push(content);

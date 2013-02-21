@@ -22,6 +22,7 @@ module.exports = function(grunt) {
           applyConfig: false,
           groups: {
             myGroup: {
+              useFullPath: true,
               modules: ['test/fixtures/**/*.js']
             }
           }
