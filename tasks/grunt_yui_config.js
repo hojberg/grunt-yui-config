@@ -7,6 +7,7 @@ module.exports = function (grunt) {
         dest    = options.dest,
         config;
 
+    console.log('Building: ' + options.dest);
     delete options.dest;
 
     if (grunt.option('debug')) {

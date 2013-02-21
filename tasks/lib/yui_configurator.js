@@ -1,16 +1,12 @@
 var path    = require('path'),
     crypto  = require('crypto');
 
-// overwrite the global YUI object to sniff module meta data
-global.YUI = {
-  add: function () {}
-};
-
 /**
 @class YUIConfigurator
 @constructor
 **/
 var YUIConfigurator = function (options, grunt) {
+  global.YUI    = undefined;
   this.options  = options;
   this.grunt    = grunt;
 };
@@ -138,22 +134,28 @@ YUIConfigurator.prototype = {
       // is it a yui module?
       if (content.indexOf('YUI.add') !== -1) {
         // overwrite add on the YUI global for each path to record the path
-        YUI.add = function (name, module, version, options) {
-          modules[name] = {
-            requires: options.requires || []
-          };
+        global.YUI = {
+          add: function (name, module, version, options) {
+            modules[name] = {
+              requires: options.requires || []
+            };
 
-          modules[name][pathKey] = modpath;
+            modules[name][pathKey] = modpath;
+            console.log("✓ " + name + ' added');
+          }
         };
 
         // load in the YUI module to sniff the meta data
         require(resolvedPath);
+        delete require.cache[resolvedPath];
       }
       else {
         parts = modpath.split('/');
         name  = parts[parts.length - 1].replace('.js', '');
         modules[name] = {};
         modules[name][pathKey] = modpath;
+
+        console.log("✓ " + name + ' added');
       }
 
       contents.push(content);

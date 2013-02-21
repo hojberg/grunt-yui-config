@@ -1,5 +1,5 @@
 YUI.add("my-module", function (Y) {
- 
+
   Y.MyModule = function () {};
 
 },

@@ -23,7 +23,8 @@ module.exports = function(grunt) {
           groups: {
             myGroup: {
               useFullPath: true,
-              modules: ['test/fixtures/**/*.js']
+              modules: ['test/fixtures/**/*.js'],
+              excludeFiles: ['test/fixtures/not_me.js']
             }
           }
         }
