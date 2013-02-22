@@ -35,7 +35,7 @@ YUIConfigurator.prototype = {
     config = JSON.stringify(config);
 
     if (applyConfig) {
-      config = "YUI.applyConfig(" + JSON.stringify(config) + ");";
+      config = "YUI.applyConfig(" + config + ");";
     }
 
     this.output = config;
