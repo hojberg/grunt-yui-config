@@ -159,7 +159,7 @@ YUIConfigurator.prototype = {
         	name = processName(p);
         }else{
         	parts = modpath.split('/');
-            name  = parts[parts.length - 1].replace('.js', '');
+        	name  = parts[parts.length - 1].replace('.js', '');
         }
 
         modules[name] = {};
