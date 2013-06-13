@@ -155,13 +155,13 @@ YUIConfigurator.prototype = {
       }
       else {
 
+    	parts = modpath.split('/');
+      	name  = parts[parts.length - 1].replace('.js', '');
+      	
         if(processName){
-        	name = processName(p);
-        }else{
-        	parts = modpath.split('/');
-        	name  = parts[parts.length - 1].replace('.js', '');
+        	name = processName(name, p);
         }
-
+        
         modules[name] = {};
         modules[name][pathKey] = modpath;
 
