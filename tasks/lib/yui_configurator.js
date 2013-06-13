@@ -83,7 +83,8 @@ YUIConfigurator.prototype = {
         group.modules,
         group.useFullPath,
         group.excludeFiles || [],
-        group.processPath
+        group.processPath,
+        group.processName
       );
 
       group.modules = definitions.modules;
@@ -91,6 +92,7 @@ YUIConfigurator.prototype = {
 
       delete group.excludeFiles;
       delete group.useFullPath;
+      delete group.processPath;
       delete group.processPath;
 
       if (comboBase.indexOf('{{hash}}')) {
@@ -108,8 +110,9 @@ YUIConfigurator.prototype = {
   @param {Boolean} useFullPath
   @param {Array} exclusions
   @param {Function} processPath - optional
+  @param {Function} processName - optional
   **/
-  buildModuleDefinition: function (paths, useFullPath, exclusions, processPath) {
+  buildModuleDefinition: function (paths, useFullPath, exclusions, processPath, processName) {
     var grunt     = this.grunt,
         pathKey   = useFullPath ? 'fullpath' : 'path',
         contents  = [],
@@ -133,6 +136,7 @@ YUIConfigurator.prototype = {
 
       // is it a yui module?
       if (content.indexOf('YUI.add') !== -1) {
+
         // overwrite add on the YUI global for each path to record the path
         global.YUI = {
           add: function (name, module, version, options) {
@@ -150,8 +154,14 @@ YUIConfigurator.prototype = {
         delete require.cache[resolvedPath];
       }
       else {
-        parts = modpath.split('/');
-        name  = parts[parts.length - 1].replace('.js', '');
+
+        if(processName){
+        	name = processName(p);
+        }else{
+        	parts = modpath.split('/');
+            name  = parts[parts.length - 1].replace('.js', '');
+        }
+
         modules[name] = {};
         modules[name][pathKey] = modpath;
 

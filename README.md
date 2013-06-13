@@ -46,6 +46,14 @@ Provide the `processPath` function to modify the path of the module.
 This is useful because Grunt sees the module paths relative to the Gruntfile
 itself.
 
+## processName
+Provide the `processName` function to modify the generated name of the module.
+This is useful when you need to add non YUI modules to your config. By default,
+the path to the module is intelligently parsed from the result of `processedPath`, 
+but sometimes, you might want your `processPath` to add a `-min` suffix to the 
+generated files. This allows you to return the name of the module so that it does
+not have the `-min`. 
+
 ## excludeFiles
 use the `excludeFiles` options to exclude any non YUI modules from to build
 the config from.
