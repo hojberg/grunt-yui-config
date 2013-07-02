@@ -149,7 +149,7 @@ YUIConfigurator.prototype = {
         modules   = [];
 
     // expand glob
-    paths       = grunt.file.expand(paths);
+    paths       = grunt.file.expand(paths).sort();
     exclusions  = grunt.file.expand(exclusions);
 
     paths.forEach(function (p) {
