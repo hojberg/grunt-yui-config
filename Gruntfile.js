@@ -1,9 +1,26 @@
 module.exports = function(grunt) {
   grunt.initConfig({
     yuiConfig: {
+      devTemplate: {
+        options: {
+          dest: 'yui_config_from_tmpl.js',
+          template: 'test/yui_config.tmpl',
+          groups: {
+            myGroup: {
+              modules: ['test/fixtures/**/*.js'],
+              processPath: function (p) {
+                return p.replace('test', 'public');
+              },
+              excludeFiles: ['test/fixtures/not_me.js']
+            }
+          }
+        }
+      },
+
       dev: {
         options: {
           dest: 'yui_config.js',
+          applyConfig: true,
           groups: {
             myGroup: {
               comboBase: 'super/{{hash}}/path',
@@ -16,6 +33,7 @@ module.exports = function(grunt) {
           }
         }
       },
+
       server: {
         options: {
           dest: 'yui_config_server.js',

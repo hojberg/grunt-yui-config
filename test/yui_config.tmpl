@@ -1,0 +1,15 @@
+YUI.applyConfig({
+  groups:{
+    "myGroup":{
+      comboBase: "super/<%= groups['myGroup'].hash %>/path",
+      modules: {
+        <% groups['myGroup'].modules.forEach(function (module, i) { %>
+        "<%= module.name %>": {
+          requires: <%= JSON.stringify(module.requires) %>,
+          path: "<%= module.path %>"
+        }<% if (i !== (groups['myGroup'].modules.length - 1)) { %>,<% } %>
+        <% }); %>
+      }
+    }
+  }
+});

@@ -1,11 +1,16 @@
 var path    = require('path'),
-    crypto  = require('crypto');
+    crypto  = require('crypto'),
+    clone   = require('clone');
 
 /**
 @class YUIConfigurator
 @constructor
 **/
 var YUIConfigurator = function (options, grunt) {
+  this.applyConfig = options.applyConfig;
+
+  delete options.applyConfig;
+
   global.YUI    = undefined;
   this.options  = options;
   this.grunt    = grunt;
@@ -27,18 +32,53 @@ YUIConfigurator.prototype = {
   @method createConfig
   **/
   createConfig: function () {
-    var opts        = this.options,
-        applyConfig = opts.applyConfig,
-        config      = this.extractModuleDefinitions(opts),
+    this.extractModuleDefinitions(this.options);
+    this.serializeConfig(this.config);
+  },
+
+  /**
+  @method serializeConfig
+  **/
+  serializeConfig: function (cfg) {
+    var config = clone(cfg),
+        group, modules,
         output;
 
-    config = JSON.stringify(config);
+    for (var key in config.groups) {
+      group = config.groups[key];
+      modules = group.modules;
 
-    if (applyConfig) {
-      config = "YUI.applyConfig(" + config + ");";
+      if (config.groups[key].comboBase) {
+        group.comboBase = group.comboBase.replace('{{hash}}', group.hash);
+      }
+
+      delete group.hash;
+
+      group.modules = {};
+
+      modules.forEach(function (mod) {
+        group.modules[mod.name] = {
+          requires: mod.requires
+        };
+
+        if (mod.path) {
+          group.modules[mod.name].path = mod.path;
+        }
+        else {
+          group.modules[mod.name].fullpath = mod.fullpath;
+        }
+      });
+
+      config.groups[key] = group;
     }
 
-    this.output = config;
+    output = JSON.stringify(config);
+
+    if (this.applyConfig) {
+      output = "YUI.applyConfig(" + output + ");";
+    }
+
+    this.output = output;
   },
 
   /**
@@ -51,9 +91,7 @@ YUIConfigurator.prototype = {
   **/
   extractModuleDefinitions: function (config) {
     var groups = config.groups,
-        k, comboBase, shasum;
-
-    delete config.applyConfig;
+        k, shasum;
 
     if (groups) {
       for (k in groups) {
@@ -61,9 +99,7 @@ YUIConfigurator.prototype = {
       }
     }
 
-    config = this._buildGroup(config);
-
-    return config;
+    this.config = this._buildGroup(config);
   },
 
   /**
@@ -74,8 +110,6 @@ YUIConfigurator.prototype = {
   **/
   _buildGroup: function (group) {
     var shasum        = crypto.createHash('sha1'),
-        fileContents  = [],
-        comboBase     = group.comboBase || '',
         definitions;
 
     if ('modules' in group) {
@@ -88,17 +122,13 @@ YUIConfigurator.prototype = {
       );
 
       group.modules = definitions.modules;
-      fileContents  = definitions.contents;
+      shasum.update(definitions.contents.join(''));
+      group.hash = shasum.digest('hex');
 
       delete group.excludeFiles;
       delete group.useFullPath;
       delete group.processPath;
       delete group.processPath;
-
-      if (comboBase.indexOf('{{hash}}')) {
-        shasum.update(fileContents.join(''));
-        group.comboBase = comboBase.replace('{{hash}}', shasum.digest('hex'));
-      }
     }
 
     return group;
@@ -116,7 +146,7 @@ YUIConfigurator.prototype = {
     var grunt     = this.grunt,
         pathKey   = useFullPath ? 'fullpath' : 'path',
         contents  = [],
-        modules   = {};
+        modules   = [];
 
     // expand glob
     paths       = grunt.file.expand(paths);
@@ -125,26 +155,29 @@ YUIConfigurator.prototype = {
     paths.forEach(function (p) {
       var resolvedPath  = path.resolve(p),
           content       = grunt.file.read(resolvedPath),
+          modMeta       = { requires: [] },
           modpath,
           parts,
           name;
+
+      // add to contents for sha
+      contents.push(content);
 
       if (exclusions.indexOf(p) !== -1) return;
 
       // process the path if a processor is provided
       modpath = (processPath ? processPath(p) : p);
+      modMeta[pathKey] = modpath;
 
       // is it a yui module?
       if (content.indexOf('YUI.add') !== -1) {
 
         // overwrite add on the YUI global for each path to record the path
         global.YUI = {
-          add: function (name, module, version, options) {
-            modules[name] = {
-              requires: options.requires || []
-            };
+          add: function (name, moduleBody, version, options) {
+            modMeta.name = name;
+            modMeta.requires = options.requires || [];
 
-            modules[name][pathKey] = modpath;
             console.log("✓ " + name + ' added');
           }
         };
@@ -154,21 +187,18 @@ YUIConfigurator.prototype = {
         delete require.cache[resolvedPath];
       }
       else {
-
-    	parts = modpath.split('/');
+    	  parts = modpath.split('/');
       	name  = parts[parts.length - 1].replace('.js', '');
 
         if (processName) {
         	name = processName(name, p);
         }
-
-        modules[name] = {};
-        modules[name][pathKey] = modpath;
+        modMeta.name = name;
 
         console.log("✓ " + name + ' added');
       }
 
-      contents.push(content);
+      modules.push(modMeta);
     });
 
     return {
