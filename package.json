@@ -2,7 +2,8 @@
   "name": "grunt-yui-config",
   "version": "0.2.0",
   "dependencies": {
-    "grunt": "~0.4.0"
+    "grunt": "~0.4.0",
+    "clone": "~0.1.9"
   },
   "engine": {
     "node": ">=0.8.x"
