@@ -9,6 +9,8 @@ module.exports = function (grunt) {
         fileContent,
         config;
 
+    console.log('Building: ' + dest);
+
     delete options.dest;
 
     if (grunt.option('debug')) {
