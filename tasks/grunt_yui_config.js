@@ -21,6 +21,10 @@ module.exports = function (grunt) {
       options.applyConfig = false;
     }
 
+    if (!('allowModuleOverwrite' in options)) {
+      options.allowModuleOverwrite = false;
+    }
+
     config = new YUIConfigurator(options, grunt);
     config.build();
 

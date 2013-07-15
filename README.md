@@ -64,6 +64,11 @@ YUI.applyConfig({
 });
 ```
 
+## allowModuleOverwrite
+Provide the boolean `allowModuleOverwrite`
+if you have multiple modules with the same name and the
+last one should win. Default is `false`.
+
 ## processPath
 Provide the `processPath` function to modify the path of the module.
 This is useful because Grunt sees the module paths relative to the Gruntfile

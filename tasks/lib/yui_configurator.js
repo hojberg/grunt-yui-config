@@ -8,8 +8,10 @@ var path    = require('path'),
 **/
 var YUIConfigurator = function (options, grunt) {
   this.applyConfig = options.applyConfig;
+  this.allowModuleOverwrite = options.allowModuleOverwrite;
 
   delete options.applyConfig;
+  delete options.allowModuleOverwrite;
 
   global.YUI    = undefined;
   this.options  = options;
@@ -41,6 +43,8 @@ YUIConfigurator.prototype = {
   **/
   serializeConfig: function (cfg) {
     var config = clone(cfg),
+        allowModuleOverwrite = this.allowModuleOverwrite,
+        moduleNames = [],
         group, modules,
         output;
 
@@ -57,6 +61,14 @@ YUIConfigurator.prototype = {
       group.modules = {};
 
       modules.forEach(function (mod) {
+        if (!allowModuleOverwrite) {
+          if (moduleNames.indexOf(mod.name) !== -1) {
+            throw new Error("Can't add multiple YUI modules with the name of '" + mod.name + "'");
+          }
+        }
+
+        moduleNames.push(mod.name);
+
         group.modules[mod.name] = {
           requires: mod.requires
         };
