@@ -34,12 +34,35 @@ grunt.initConfig({
 });
 ```
 
-Anything you pass to this will be added to the config, 
+Anything you pass to this will be added to the config,
 except `dest`, `excludeFiles` and `processPath` which will be removed
 as the config is being generated.
 
 ## dest
 Give the `dest` option to provide the output file of the YUI config.
+
+## template
+Give the `template` option with a path to a template file used to generate the
+YUI config. The `groups` variable is passed to the template.
+
+Example of a template file:
+```javascript
+YUI.applyConfig({
+  groups:{
+    "myGroup":{
+      comboBase: "super/<%= groups['myGroup'].hash %>/path",
+      modules: {
+        <% groups['myGroup'].modules.forEach(function (module, i) { %>
+        "<%= module.name %>": {
+          requires: <%= JSON.stringify(module.requires) %>,
+          path: "<%= module.path %>"
+        }<% if (i !== (groups['myGroup'].modules.length - 1)) { %>,<% } %>
+        <% }); %>
+      }
+    }
+  }
+});
+```
 
 ## processPath
 Provide the `processPath` function to modify the path of the module.
@@ -49,10 +72,10 @@ itself.
 ## processName
 Provide the `processName` function to modify the generated name of the module.
 This is useful when you need to add non YUI modules to your config. By default,
-the path to the module is intelligently parsed from the result of `processedPath`, 
-but sometimes, you might want your `processPath` to add a `-min` suffix to the 
+the path to the module is intelligently parsed from the result of `processedPath`,
+but sometimes, you might want your `processPath` to add a `-min` suffix to the
 generated files. This allows you to return the name of the module so that it does
-not have the `-min`. 
+not have the `-min`.
 
 ## excludeFiles
 use the `excludeFiles` options to exclude any non YUI modules from to build
@@ -60,6 +83,6 @@ the config from.
 
 ## `{{hash}}` in `comboBase`
 
-Provide `{{hash}}` in your comboBase string and it will be interpolated with 
+Provide `{{hash}}` in your comboBase string and it will be interpolated with
 a sha of the contents of the files in the associated `group`. This is useful
 for providing a fully cachable url.
