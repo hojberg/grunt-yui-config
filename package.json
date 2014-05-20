@@ -1,6 +1,6 @@
 {
   "name": "grunt-yui-config",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "dependencies": {
     "grunt": "~0.4.0",
     "clone": "~0.1.9",
