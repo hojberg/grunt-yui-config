@@ -188,7 +188,7 @@ YUIConfigurator.prototype = {
         global.YUI = {
           add: function (name, moduleBody, version, options) {
             modMeta.name = name;
-            modMeta.requires = options.requires || [];
+            modMeta.requires = options && options.requires || [];
 
             console.log("✓ " + name + ' added');
           }
