@@ -6,6 +6,7 @@ module.exports = function(grunt) {
           dest: 'yui_config_from_tmpl.js',
           template: 'test/yui_config.tmpl',
           allowModuleOverwrite: true,
+          verbose: true,
           groups: {
             myGroup: {
               modules: ['test/fixtures/**/*.js'],
@@ -23,6 +24,7 @@ module.exports = function(grunt) {
           dest: 'yui_config.js',
           applyConfig: true,
           allowModuleOverwrite: true,
+          verbose: true,
           groups: {
             myGroup: {
               comboBase: 'super/{{hash}}/path',
@@ -41,6 +43,7 @@ module.exports = function(grunt) {
           dest: 'yui_config_server.js',
           applyConfig: false,
           allowModuleOverwrite: true,
+          verbose: true,
           groups: {
             myGroup: {
               useFullPath: true,
