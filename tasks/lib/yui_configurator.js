@@ -130,7 +130,8 @@ YUIConfigurator.prototype = {
         group.useFullPath,
         group.excludeFiles || [],
         group.processPath,
-        group.processName
+        group.processName,
+        this.options
       );
 
       group.modules = definitions.modules;
@@ -154,7 +155,7 @@ YUIConfigurator.prototype = {
   @param {Function} processPath - optional
   @param {Function} processName - optional
   **/
-  buildModuleDefinition: function (paths, useFullPath, exclusions, processPath, processName) {
+  buildModuleDefinition: function (paths, useFullPath, exclusions, processPath, processName, opts) {
     var grunt     = this.grunt,
         pathKey   = useFullPath ? 'fullpath' : 'path',
         contents  = [],
@@ -190,7 +191,9 @@ YUIConfigurator.prototype = {
             modMeta.name = name;
             modMeta.requires = options && options.requires || [];
 
-            console.log("✓ " + name + ' added');
+            if (options && options.verbose) {
+              console.log("✓ " + name + ' added');
+            }
           }
         };
 
@@ -207,7 +210,9 @@ YUIConfigurator.prototype = {
         }
         modMeta.name = name;
 
-        console.log("✓ " + name + ' added');
+        if (opts && opts.verbose) {
+          console.log("✓ " + name + ' added');
+        }
       }
 
       modules.push(modMeta);
